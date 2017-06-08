@@ -1,0 +1,63 @@
+<div ng-cloak>
+
+    <section id="partner">
+        <div class="container">
+            <div class="center wow fadeInDown">
+                <h2>ACME Security Systems</h2>
+                <p>Providing the Transition from Communication Security to Information Security</p>
+            </div>    
+
+
+        </div><!--/.container-->
+    </section>
+    <section id="blog" class="blog">   
+        <div class="container">
+            <div class="col-md-8">
+                <div class="blog-content">
+                    <h1>Git workflow for mobile development</h1>
+                    <hr>
+                    <ul>
+                        <li>Published:  18 February 2016</li>
+                        <li>Author: Alice Sandhu, Director of Software Development</li>
+                    </ul>
+
+                    <p>So, we started using gitflow workflow with our server side as well as mobile development. It works out really well with server side code, since there is test coverage and with build automation, feature branches get merged into development branch as soon as they are tested ok. Unlike mobile development, since the changes are live as soon as you wish to (no time to deploy apart from build and testing), you can quickly test if there are any bugs in code you pushed and quickly make changes. So this workflow works out really great for server side development. However we are facing issues with mobile development with this workflow. </p>
+                    <p>Now there are two major issues that we are facing with this workflow. One is that suppose we merged some feature into development and later figured out that there are lot of bugs in it. Now it can’t be pushed further, whole development cycle is stuck because that code is already merged with development. This is the reason we started forking feature branches from master rather than development as at least individual feature branches will have fully working code. One way is that each feature can be separately distributed to team members to test and only then will <p>be merged to development but it's very cumbersome</p>
+                    <p>Another problem is since base code with every feature branch is from master branch and it has to be merged with development, there are lot of conflicts. Earlier when we used to fork from development, we used to regularly merge development branch with feature branches so there were no conflicts but can’t do that anymore. So now to fix conflicts, we create another temporary branch from feature branch with which we merge dev code, fix conflicts and <p>put that as pull request which is again little cumbersome. </p>
+                    <p>Is there a better workflow for mobile development that people have adopted or even some practices that can be followed to solve these problems? </p>
+
+                </div>
+            </div>
+            <aside class="col-md-4">
+                <div class="widget search">
+                    <form role="form">
+                        <input type="text" class="form-control search_box" autocomplete="off" placeholder="Search Here">
+                    </form>
+                </div><!--/.search-->
+
+                <div class="widget categories">
+                    <h3>Recent Posts</h3>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="single_comments">
+
+                                <p><a ui-sref="blog1">Hashing Passwords in PHP Using MD5 vs. SHA vs. Bcrypt</a></p>
+                                <div class="entry-meta small muted">
+                                    <span>By: Paul Koffi, QA Director</span>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>                     
+                </div><!--/.recent comments-->
+
+
+
+            </aside>
+        </div><!--/.container-->
+    </section><!--/#contact-page-->
+
+</div>
+
+

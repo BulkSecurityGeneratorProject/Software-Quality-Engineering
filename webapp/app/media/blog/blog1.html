@@ -1,0 +1,72 @@
+<div ng-cloak>
+
+    <section id="partner">
+        <div class="container">
+            <div class="center wow fadeInDown">
+                <h2>ACME Security Systems</h2>
+                <p>Providing the Transition from Communication Security to Information Security</p>
+            </div>    
+        </div><!--/.container-->
+    </section>
+
+    <section id="blog" class="blog">   
+        <div class="container">
+            <div class="col-md-8">
+                <div class="blog-content">
+                    <h1>Hashing Passwords in PHP Using MD5 vs. SHA vs. Bcrypt</h1>
+                    <hr/>
+                    <ul>
+                        <li>Published: 07 June 2016 </li>
+                        <li>Author: Paul Koffi, QA Director</li>
+                    </ul>
+                    <p>Many people have had questions about how to properly store passwords in the database. Most of us have learned that it is a really bad idea to store them in plaintext. </p>
+
+                    <p>Instead of storing them in plaintext we do store them with a one-way hash, such as md5, sha or bcrypt. This way even if someone gets a copy of your password database it will become harder to figure out a user’s password. A one way hash in this example is a (seemingly) one-to-one mapping from a string to another string. In theory you can’t run a function on the hashed password to get back the plaintext password. So if someone gets your database then, no problem? </p>
+
+                    <p>Well yes and no; a hacker can still try running a huge list of possible passwords and see if they match any of hashes in the database. So the faster a hash function is to calculate the worse it is for security, because the hacker can try more passwords faster and cheaply. </p>
+
+                    <p>MD5 and SHA were designed to be really, really fast. So a hacker can run many possible passwords through them in order to check. BCRYPT, which is a variant of the blowfish encryption algorithm, can be made arbitrarily difficult. Put it another way, the number of CPU cycles for MD5 and SHA are very few because they are meant to be fast, bcrypt can be made to require a huge amount of CPU cycles to calculate the result. </p>
+
+                    <p>Bcrypt is better because it can be made to take up more CPU cycles. END OF STORY!
+                    <p>Or is it… Well in reality <strong>all we are REALLY trying to do is make a trade-off between the number of CPU cycles we are willing to give up in-order to make the users passwords more secure vs. how many CPU cycles the hackers are willing to give up in order to crack the password. </strong></p>
+
+                    <p>Sidenote: adding a random salt doesn’t in practice significantly increase the number of CPU cycles, it only makes it so the hackers must recalculate hashes for common passwords. Its never a bad idea to hash, its just not terribly effective either. </p>
+
+                    <p>Bcrypt would be an obvious choice if it was more portable, however as of the writing of this post bcrypt is not built into most database servers. MD5 and SHA are available in most servers and languages. Loading an external bcrypt library takes a bit of CPU cycles that could be better used in running the hash function and you have to port all that library. Loading the library doesn’t make the password more secure, only running the algorithm does. So if we want to make things simple just use md5 or SHA iteratively. </p>
+
+                    <p>Ultimately, due to lack of portability of bcrypt and high computational cost, I’ve a strong preference toward using MD5 or SHA for password storage. </p>
+                </div>
+            </div>
+            <aside class="col-md-4">
+                <div class="widget search">
+
+                    <input type="text" class="form-control search_box" autocomplete="off" placeholder="Search Here">
+
+                </div><!--/.search-->
+
+                <div class="widget categories">
+                    <h3>Recent Posts</h3>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div>
+                                
+                                <p><a ui-sref="blog2">Git workflow for mobile development</a></p>
+                                <div class="entry-meta small muted">
+                                    <span>By: Alice Sandhu, Director of Software Development</span>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>                     
+                </div><!--/.recent comments-->
+
+
+
+            </aside>
+        </div><!--/.container-->
+    </section><!--/#contact-page-->
+
+</div>
+
+

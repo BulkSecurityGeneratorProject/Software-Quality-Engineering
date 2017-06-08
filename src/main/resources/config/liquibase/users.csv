@@ -1,0 +1,10 @@
+id;login;password_hash;first_name;last_name;email;activated;lang_key;created_by;last_modified_by;role
+1;system@acme.com;$2a$10$mE.qmcV0mFU5NcKh73TZx.z4ueI/.bDWbj0T1BYyqP481kGGarKLG;System; ;system@acme.com;true;en;system;system;ADMIN
+2;admin@acme.com;$2a$10$nMb3thKma/cllKLbJL0uvO9Iq7ruv3AWSrk3rCV0Q.92sHAhIQ68q;Administrator; ;admin@acme.com;true;en;system;system;ADMIN
+3;user@acme.com;$2a$10$VEjxo0jq2YG9Rbk2HmX9S.k1uZBGYUHdUcid3g/vfiEl7lwWgOH/K;User; ;user@acme.com;true;en;system;system;USER
+4;jo.thomas@acme.com;$2a$10$iBPwr/th2Is12EN5yEjMG.qNvkSxuo33TyD.OkRl37.QTYjySqIKu;Jo;Thomas;jo.thomas@acme.com;true;en;system;system;MANAGER
+5;john.gallager@acme.com;$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChGWJA7SYIb1Mqo.n5aNLq1/oRrC;John;Gallager;john.gallager@acme.com;true;en;system;system;MANAGER
+6;frank.paul@acme.com;$2a$10$vDqWThdbXRupvL5E.8E24O1H6rNrgeA7.jVDKeGEmx0zf.aFznpfi;Frank;Paul;frank.paul@acme.com;true;en;system;system;EMPLOYEE
+7;paul.robert@acme.com;$2a$10$zshNLOtxxSeccDiXoMGzQOnGXkpgPSyLFUitH1asUhuyY27viIVwe;Paul;Roberts;paul.robert@acme.com;true;en;system;system;EMPLOYEE
+8;tom.hayes@acme.com;$2a$10$6Nq0yHQNNUK7wt9ZJ5kgkuyr0l8G4jj6DvFceR3iEKvRtjzGL2u.W;Tom;Hayes;tom.hayes@acme.com;true;en;system;system;EMPLOYEE
+9;alice.sandhu@acme.com;$2a$10$Cstvzs1wzIFue/fhVggYo.gCSsADBEWJ1hFyAjGMGU2pXgxSZqsHW;Alice;Sandhu;alice.sandhu@acme.com;true;en;system;system;EMPLOYEE
