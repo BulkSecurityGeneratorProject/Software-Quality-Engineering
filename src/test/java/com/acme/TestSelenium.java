@@ -7,12 +7,14 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import java.util.concurrent.TimeUnit;
 import java.io.File;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class TestSelenium {
@@ -30,26 +32,22 @@ public class TestSelenium {
 
         //service.start();
 
-	
-
+        // driver = new HtmlUnitDriver(true);
         driver = new RemoteWebDriver(new URL("http://localhost:22000"), DesiredCapabilities.chrome());
-        url = "http://www.google.com";
+        url = "http://localhost:8080/#/";
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-    }
+	    driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
+        }
 
     @Test
-    public void headerIsCorrect() throws Exception {
-	System.out.println("Running!");
+    public void UserCanSignIn() throws Exception {
         driver.get(url);
 
-	Thread.sleep(10000);
-
-        assertEquals("ACME Security System ", driver.findElement(By.tagName("h1")).getText());
-        //driver.findElement(By.cssSelector("a[ui-sref=\"technology\"")).click();
-        //WebElement header = driver.findElement(By.cssSelector("div.container > h1"));
-
-        //assertEquals("Technology", header.getText());
-        // ERROR: Caught exception [unknown command []]
+        driver.findElement(By.linkText("Sign in")).click();
+	    driver.findElement(By.id("username")).sendKeys("tom.hayes@acme.com");
+    	driver.findElement(By.id("password")).sendKeys("superman");
+	    assertTrue(driver.findElement(By.id("account-menu")).isDisplayed());
     }
 
     @After
