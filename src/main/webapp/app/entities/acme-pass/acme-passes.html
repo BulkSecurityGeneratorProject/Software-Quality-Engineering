@@ -41,7 +41,7 @@
                     <td>{{acmePass.login}}</td>
                     <td>
 						<div>
-							<input type="password" ng-model="acmePass.password" class="acmepass-password" style="font-size: 1.6em; margin: -5px 0;" readonly/>
+                            <input ng-attr-type="{{acmePass.visible ? 'text' : 'password'}}" type="password" ng-model="acmePass.password" class="acmepass-password" style="font-size: 1.6em; margin: -5px 0;" readonly/>
 							<span ng-click="vm.toggleVisible(acmePass.id)" style="float:right; cursor: pointer; padding: 5px 20px 0 0;" class="glyphicon glyphicon-eye-open"></span>
 						</div>
 					</td>

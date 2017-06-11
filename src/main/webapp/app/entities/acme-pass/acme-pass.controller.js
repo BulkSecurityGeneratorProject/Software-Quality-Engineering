@@ -52,7 +52,17 @@
         }
 
         function toggleVisible(id) {
-            //TODO show password and change eye icon
+            // Plan: if the input type is password, change it to text and vice versa.
+            for (var i = 0; i < vm.acmePasses.length; i++) {
+                var acmePass = vm.acmePasses[i];
+                if (acmePass.id == id) {
+                    if (!acmePass.visible) {
+                        acmePass.visible = true;
+                    } else {
+                        acmePass.visible = false;
+                    }
+                }
+            }
         }
 
         function transition() {
