@@ -1,4 +1,5 @@
 target
 .idea/*
 *.iml
-*application-dev.yml
+src/main/resources/config/*
+src/.metadata/*
