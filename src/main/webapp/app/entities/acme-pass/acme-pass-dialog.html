@@ -45,9 +45,9 @@
 			<div class="col-lg-10" style="padding: 0;">
 				<label class="control-label" for="field_password">Password</label>
 				<div>
-					<input type="password" class="form-control" name="password" id="field_password"
+					<input ng-attr-type="{{vm.pwdVisible ? 'text' : 'password'}}" type="password" class="form-control" name="password" id="field_password"
 						   ng-model="vm.acmePass.password" required />
-					<span class="glyphicon glyphicon-eye-open" style="float:right; cursor: pointer; margin: -23px 16px 0px 0;"></span>
+					<span ng-click="vm.toggleVisible()" class="glyphicon glyphicon-eye-open" style="float:right; cursor: pointer; margin: -23px 16px 0px 0;"></span>
 				</div>
 				<div ng-show="editForm.password.$invalid">
 					<p class="help-block" ng-show="editForm.password.$error.required">

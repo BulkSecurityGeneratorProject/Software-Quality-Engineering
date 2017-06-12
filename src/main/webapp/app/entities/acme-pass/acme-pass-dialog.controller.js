@@ -18,10 +18,15 @@
 		vm.clear = clear;
 		vm.users = User.query();
 		vm.pwdVisible = false;
+		vm.toggleVisible = toggleVisible;
 
 		$timeout(function () {
 			angular.element('.form-group:eq(1)>input').focus();
 		});
+
+		function toggleVisible() {
+			vm.pwdVisible = !vm.pwdVisible;
+		}
 
 		function openPwdGenModal() {
 			$uibModal.open({
