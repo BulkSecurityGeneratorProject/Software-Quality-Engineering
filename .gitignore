@@ -3,3 +3,5 @@ target
 *.iml
 src/main/resources/config/*
 src/.metadata/*
+node_modules
+npm-debug.log

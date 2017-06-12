@@ -89,8 +89,10 @@ public class ACMEPassService {
 	public void delete(Long id) {
 		log.debug("Request to delete ACMEPass : {}", id);
 
-		if (acmePassRepository.findOne(id).getUser().equals(SecurityUtils.getCurrentUser())) {
+		if (acmePassRepository.findOne(id).getUser().getEmail().equals(SecurityUtils.getCurrentUser())) {
             acmePassRepository.delete(id);
-        }
+        } else {
+			throw new RuntimeException("You must be the user who created the password in order to delete the password.");
+		}
 	}
 }

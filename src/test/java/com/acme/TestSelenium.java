@@ -36,7 +36,7 @@ public class TestSelenium {
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	    driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
         driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
-        }
+    }
 
     @Test
     public void userCanSignIn() throws Exception {
