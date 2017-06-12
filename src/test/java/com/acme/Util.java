@@ -4,6 +4,7 @@ import org.openqa.selenium.*;
 
 import java.util.Random;
 
+@SuppressWarnings("WeakerAccess")
 public class Util {
     private static final long TIMEOUT = 5000;
     private static final long POLL = 100;

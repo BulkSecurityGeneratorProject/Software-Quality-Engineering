@@ -1,6 +1,7 @@
 package com.acme;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -8,9 +9,11 @@ import javax.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.acme.Util.*;
 
+@SuppressWarnings("WeakerAccess")
 public class PasswordHelper {
     private final LoginHelper _loginHelper;
 
@@ -30,18 +33,42 @@ public class PasswordHelper {
         _rootUrl = rootUrl;
     }
 
-    public boolean doesPasswordExist() throws InterruptedException {
-        givenOnAcmePassPage();
+    public boolean aPasswordExists() throws InterruptedException {
+        givenOnFirstAcmePassPage();
         return exists(_driver, By.xpath("//input[@type='password']"));
     }
 
-    public void goToNextPage() {
+    public boolean passwordEntryExists(String site, String login, String password) throws InterruptedException {
+        //goto first page.
+        givenOnFirstAcmePassPage();
+
+        while (true) {
+            boolean foundPassword = getPasswordsOnPage().stream().anyMatch((storedPassword) ->
+                    Objects.equals(storedPassword.site, site) &&
+                            Objects.equals(storedPassword.login, login) &&
+                            Objects.equals(storedPassword.password, password)
+            );
+            if (foundPassword) {
+                return true;
+            }
+
+            try {
+                goToNextPage();
+            } catch (NoSuchElementException e) {
+                // no more passwords to try
+                return false;
+            }
+        }
+
+    }
+
+    public void goToNextPage() throws NoSuchElementException {
         // Will not find anything if there is no next page.
         _driver.findElement(By.xpath("//li[@class='next']/a")).click();
     }
 
     public PasswordCreationModalHelper openPasswordCreationModal() throws InterruptedException {
-        givenOnAcmePassPage();
+        givenOnFirstAcmePassPage();
         _driver.findElement(By.xpath("//button[@ui-sref='acme-pass.new']")).click();
         return new PasswordCreationModalHelper();
     }
@@ -53,19 +80,18 @@ public class PasswordHelper {
         modal.findLoginElement().sendKeys(login);
         modal.findPasswordElement().sendKeys(password);
 
-        Thread.sleep(500); // wait for the modal to load.
         confirmModal(_driver);
     }
 
     public void givenAPasswordExists() throws InterruptedException {
-        givenOnAcmePassPage();
+        givenOnFirstAcmePassPage();
 
-        if (!doesPasswordExist()) {
+        if (!aPasswordExists()) {
             createPassword("acme.com", "admin", "password");
         }
     }
 
-    public void givenOnAcmePassPage() throws InterruptedException {
+    public void givenOnFirstAcmePassPage() throws InterruptedException {
         if (!_driver.getCurrentUrl().equals(_rootUrl + "acme-pass")) {
             if (!_loginHelper.isLoggedIn()) {
                 _loginHelper.loginWith(ADMIN_USERNAME, ADMIN_PASSWORD);

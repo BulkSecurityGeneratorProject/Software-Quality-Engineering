@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class LoginHelper {
     private final WebDriver _driver;
     private final String _rootUrl;
@@ -55,6 +56,9 @@ public class LoginHelper {
                 }
             }
 
+            if (submit == null) {
+                throw new NoSuchElementException("Could not find submit button");
+            }
             submit.click();
 
             Thread.sleep(500);
