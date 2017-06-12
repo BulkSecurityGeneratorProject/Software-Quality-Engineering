@@ -65,12 +65,13 @@ public class ACMEPassViewPasswordTests extends ACMEPassTestBase {
 
         // Assume no acmepass entries yet
         // Create an entry
-        Thread.sleep(500);
+        Thread.sleep(1000);
         WebElement button = driver.findElement(By.cssSelector("button.btn.btn-primary"));
-        Thread.sleep(500);
+        Thread.sleep(1000);
+
         button.click();
 
-        Thread.sleep(500);
+        Thread.sleep(1000);
 
         driver.findElement(By.id("field_site")).clear();
         driver.findElement(By.id("field_site")).sendKeys("some_site.com");
