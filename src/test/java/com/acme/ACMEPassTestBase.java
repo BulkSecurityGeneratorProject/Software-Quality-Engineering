@@ -18,7 +18,7 @@ public abstract class ACMEPassTestBase {
     protected WebDriver driver;
     protected String url;
 
-    protected WebDriver getDriver(String browser) {
+    public WebDriver getDriver(String browser) {
         if (browser.equals("firefox")) {
             WebDriver driver = new FirefoxDriver();
             driver.manage().window().maximize();
@@ -30,7 +30,7 @@ public abstract class ACMEPassTestBase {
         }
     }
 
-    protected void loginWith(String username, String password) throws InterruptedException {
+    public void loginWith(String username, String password) throws InterruptedException {
         driver.get(url);
         if (!username.isEmpty() && !password.isEmpty()) {
             // Sign in button
