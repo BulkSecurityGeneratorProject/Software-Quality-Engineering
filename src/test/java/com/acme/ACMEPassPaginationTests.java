@@ -14,29 +14,24 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ACMEPassPaginationTests{
+public class ACMEPassPaginationTests extends ACMEPassTestBase{
 
-	private WebDriver driver;
-    private String url;
     private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
 	
 	@Before
     public void setUp() throws Exception {
-        driver = new FirefoxDriver();
-        url = "http://localhost:8080/";
+        url = "http://localhost:8080/#/";
+        driver = getDriver("firefox");
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         
-        login("paul.robert@acme.com", "shadow");
-    	WebElement acmepass = driver.findElement(By.xpath("//a[@ui-sref='acme-pass']"));
-        acmepass.click();
-        
-        Thread.sleep(500);
+        loginWith("paul.robert@acme.com", "shadow");
     }
     
-    //@Test
+    @Test
     public void paginateForwardsWhen0Entries() throws Exception{
     	ensureCorrectNumberOfEntries(0);
     	
@@ -62,7 +57,7 @@ public class ACMEPassPaginationTests{
     	assertEquals("Showing 1 - 20 of 20 items.", info);
     }
     
-    
+    @Test
     public void paginateForwardsWhen21Entries() throws Exception{
         
         ensureCorrectNumberOfEntries(21);
@@ -76,7 +71,7 @@ public class ACMEPassPaginationTests{
     	assertEquals("Showing 21 - 21 of 21 items.", info);
     }
     
-    
+    @Test
     public void paginateForwardsWhen41Entries() throws Exception{
     	ensureCorrectNumberOfEntries(41);
     	
@@ -85,16 +80,21 @@ public class ACMEPassPaginationTests{
     	
     	Thread.sleep(500);
     	
+    	nextPageButton = driver.findElement(By.cssSelector("a[ng-click='selectPage(page + 1, $event)']"));
+    	nextPageButton.click();
+    	
+    	Thread.sleep(500);
+    	
     	String info = getInfoString();
     	assertEquals("Showing 41 - 41 of 41 items.", info);
     }
     
-    //@Test
+    @Test
     public void paginateBackwardsWhen0Entries() throws Exception{
     	ensureCorrectNumberOfEntries(0);
     	
-    	WebElement nextPageButton = driver.findElement(By.cssSelector("a[ng-click='selectPage(page - 1, $event)']"));
-    	nextPageButton.click();
+    	WebElement previousPageButton = driver.findElement(By.cssSelector("a[ng-click='selectPage(page - 1, $event)']"));
+    	previousPageButton.click();
     	
     	Thread.sleep(500);
     	
@@ -106,8 +106,8 @@ public class ACMEPassPaginationTests{
     public void paginateBackwardsWhen20Entries() throws Exception{
     	ensureCorrectNumberOfEntries(20);
     	
-    	WebElement nextPageButton = driver.findElement(By.cssSelector("a[ng-click='selectPage(page - 1, $event)']"));
-    	nextPageButton.click();
+    	WebElement previousPageButton = driver.findElement(By.cssSelector("a[ng-click='selectPage(page - 1, $event)']"));
+    	previousPageButton.click();
     	
     	Thread.sleep(500);
     	
@@ -115,9 +115,54 @@ public class ACMEPassPaginationTests{
     	assertEquals("Showing 1 - 20 of 20 items.", info);
     }
     
-    public void paginateBackwardsWhen21Entries() throws Exception{}
+    @Test
+    public void paginateBackwardsWhen21Entries() throws Exception{
+    	ensureCorrectNumberOfEntries(21);
+    	
+    	WebElement nextPageButton = driver.findElement(By.cssSelector("a[ng-click='selectPage(page + 1, $event)']"));
+    	nextPageButton.click();
+    	
+    	Thread.sleep(1000);
+    	
+    	String info = getInfoString();
+    	assertEquals("Showing 21 - 21 of 21 items.", info);
+    	
+    	Thread.sleep(1000);
+    	
+    	WebElement previousPageButton = driver.findElement(By.cssSelector("a[ng-click='selectPage(page - 1, $event)']"));
+    	previousPageButton.click();
+    	
+    	Thread.sleep(1000);
+    	
+    	info = getInfoString();
+    	assertEquals("Showing 1 - 20 of 21 items.", info);
+    }
     
-    public void paginateBackwardsWhen41Entries() throws Exception{}
+    @Test
+    public void paginateBackwardsWhen41Entries() throws Exception{
+    	ensureCorrectNumberOfEntries(41);
+    	
+    	WebElement nextPageButton = driver.findElement(By.cssSelector("a[ng-click='selectPage(page + 1, $event)']"));
+    	nextPageButton.click();
+    	
+    	Thread.sleep(1000);
+    	
+    	nextPageButton = driver.findElement(By.cssSelector("a[ng-click='selectPage(page + 1, $event)']"));
+    	nextPageButton.click();
+    	
+    	String info = getInfoString();
+    	assertEquals("Showing 41 - 41 of 41 items.", info);
+    	
+    	Thread.sleep(1000);
+    	
+    	WebElement previousPageButton = driver.findElement(By.cssSelector("a[ng-click='selectPage(page - 1, $event)']"));
+    	previousPageButton.click();
+    	
+    	Thread.sleep(1000);
+    	
+    	info = getInfoString();
+    	assertEquals("Showing 21 - 40 of 41 items.", info);
+    }
     
     @After
     public void tearDown() throws Exception {
@@ -167,6 +212,7 @@ public class ACMEPassPaginationTests{
 	private int getTotalNumberOfEntries() throws Exception {
         String str = getInfoString();
 		String[] split = str.split("\\s+");
+		
 		return Integer.parseInt(split[5]);
 	}
 	
@@ -182,32 +228,27 @@ public class ACMEPassPaginationTests{
 			removeEntries(changeNeeded);
 		}
 		
+		Thread.sleep(500);
+		
 	}
 	
 	private void addEntries(int numberOfEntries) throws Exception{
 		for(int i=0; i<numberOfEntries; i++){
+				 
+			Thread.sleep(500);
+	        WebElement button = driver.findElement(By.cssSelector("button.btn.btn-primary"));
+	        button.click();
+	
+	        Thread.sleep(500);
+	
+	        driver.findElement(By.id("field_site")).clear();
+	        driver.findElement(By.id("field_site")).sendKeys("some_site.com");
+	        driver.findElement(By.id("field_login")).clear();
+	        driver.findElement(By.id("field_login")).sendKeys("test_login");
+	        driver.findElement(By.id("field_password")).clear();
+	        driver.findElement(By.id("field_password")).sendKeys("test_password");
+	        driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary")).click();	
 			
-			WebElement newEntryButton = driver.findElement(By.xpath("//button[@href='#/acme-pass/new']"));
-			
-			if(newEntryButton != null) {
-			 
-				newEntryButton.click();
-				
-				Thread.sleep(500);
-				
-				WebElement siteField = driver.findElement(By.id("field_site"));
-				siteField.sendKeys("testsite.com");
-				
-				WebElement loginField = driver.findElement(By.id("field_login"));
-				loginField.sendKeys("testlogin");
-				
-				WebElement passwordField = driver.findElement(By.id("field_password"));
-				passwordField.sendKeys("testpassword");
-				
-				WebElement saveButton = driver.findElement(By.cssSelector("button[ng-disabled='editForm.$invalid || vm.isSaving']"));
-				saveButton.click();
-			
-			}
 		}
 	}
 	
