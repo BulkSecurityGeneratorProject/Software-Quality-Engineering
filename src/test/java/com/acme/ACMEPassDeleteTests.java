@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +40,6 @@ public class ACMEPassDeleteTests extends ACMEPassTestBase {
         PasswordHelper.Password randomPassword = passwords.get(_random.nextInt(passwords.size()));
         _passwordHelper.deletePassword(randomPassword);
 
-        assertFalse(_passwordHelper.getPasswordsOnPage().stream().anyMatch((other) -> Objects.equals(other.id, randomPassword.id)));
+        assertFalse(_passwordHelper.passwordEntryExists(randomPassword.site, randomPassword.login, randomPassword.password));
     }
 }
