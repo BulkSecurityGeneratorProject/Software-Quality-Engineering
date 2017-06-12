@@ -31,29 +31,6 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
     private String username;
     private String password;
 
-    @Test
-    public void createPasswordGoldenPath() throws InterruptedException {
-
-        Thread.sleep(1000);
-        WebElement button = driver.findElement(By.cssSelector("button.btn.btn-primary"));
-        Thread.sleep(1000);
-
-        button.click();
-
-        Thread.sleep(1000);
-
-        createPassword("site.com", "teslogin", "dduude");
-
-        //The 'save' button
-        driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary")).click();
-
-        WebElement password = driver.findElement(By.xpath("//input[@type='password']"));
-        Assert.assertNotNull(password);
-        // This doesn't currently work, since the "delete" functionality is broken.
-        driver.findElement(By.xpath("//button[2]")).click();
-        driver.findElement(By.cssSelector("button.btn.btn-danger")).click();
-    }
-
 
     @Parameterized.Parameters
     public static Collection<Object[]> users() {
@@ -83,6 +60,30 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
         driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
         loginWith(username, password);
     }
+
+    @Test
+    public void createPasswordGoldenPath() throws InterruptedException {
+
+        Thread.sleep(1000);
+        WebElement button = driver.findElement(By.cssSelector("button.btn.btn-primary"));
+        Thread.sleep(1000);
+
+        button.click();
+
+        Thread.sleep(1000);
+
+        createPassword("site.com", "teslogin", "dduude");
+
+        //The 'save' button
+        driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary")).click();
+
+        WebElement password = driver.findElement(By.xpath("//input[@type='password']"));
+        Assert.assertNotNull(password);
+        // This doesn't currently work, since the "delete" functionality is broken.
+        driver.findElement(By.xpath("//button[2]")).click();
+        driver.findElement(By.cssSelector("button.btn.btn-danger")).click();
+    }
+
     @Test
     public void createPasswordWithlessThanThreeCharacterSiteNameFails() throws InterruptedException{
         Thread.sleep(1000);
@@ -176,19 +177,19 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
             return false;
         }
     }
-
-    private String closeAlertAndGetItsText() {
-        try {
-            Alert alert = driver.switchTo().alert();
-            String alertText = alert.getText();
-            if (acceptNextAlert) {
-                alert.accept();
-            } else {
-                alert.dismiss();
-            }
-            return alertText;
-        } finally {
-            acceptNextAlert = true;
-        }
-    }
+//
+//    private String closeAlertAndGetItsText() {
+//        try {
+//            Alert alert = driver.switchTo().alert();
+//            String alertText = alert.getText();
+//            if (acceptNextAlert) {
+//                alert.accept();
+//            } else {
+//                alert.dismiss();
+//            }
+//            return alertText;
+//        } finally {
+//            acceptNextAlert = true;
+//        }
+//    }
 }
