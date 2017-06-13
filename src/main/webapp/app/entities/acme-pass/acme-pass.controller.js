@@ -25,8 +25,9 @@
                 size: vm.itemsPerPage,
                 sort: sort()
             }, onSuccess, onError);
+
             function sort() {
-                var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];
+                var result = [vm.predicate + ',' + (vm.reverse ? 'desc' : 'asc')];
                 if (vm.predicate !== 'id') {
                     result.push('id');
                 }
@@ -34,6 +35,17 @@
             }
 
             function onSuccess(data, headers) {
+                var queries = window.location.href.slice(window.location.href.indexOf('?') + 1);
+                var sortByPassword = queries.search("sort=password") >= 0;
+                var sortAscending = false;
+                if (sortByPassword) {
+                    sortAscending = queries.search("sort=password,asc") >= 0;
+                    if (sortAscending) {
+                        data.sort(function(a,b) {return (a.password < b.password) ? 1 : ((b.password < a.password) ? -1 : 0);} );
+                    } else {
+                        data.sort(function(a,b) {return (a.password > b.password) ? 1 : ((b.password > a.password) ? -1 : 0);} );
+                    }
+                }
                 vm.links = ParseLinks.parse(headers('link'));
                 vm.totalItems = headers('X-Total-Count');
                 vm.queryCount = vm.totalItems;
