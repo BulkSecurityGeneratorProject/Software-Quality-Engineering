@@ -44,12 +44,21 @@ public class Util {
         return driver.findElement(By.xpath("//div[@class='modal-footer'][last()]/button[@type='submit']"));
     }
 
+    public static WebElement getModalCancelButton(WebDriver driver) {
+        return driver.findElement(By.xpath("//div[@class='modal-footer'][last()]/button[@data-dismiss='modal']"));
+    }
+
     public static boolean isModalSubmitButtonEnabled(WebDriver driver) {
         return getModalSubmitButton(driver).getAttribute("disabled") == null;
     }
 
     public static void confirmModal(WebDriver driver) {
         getModalSubmitButton(driver).click();
+        waitUntilModalGone(driver);
+    }
+
+    public static void dismissModal(WebDriver driver) {
+        getModalCancelButton(driver).click();
         waitUntilModalGone(driver);
     }
 
