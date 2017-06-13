@@ -1,45 +1,11 @@
 <script>
-function getMinLength(){
-	var lowercase = document.getElementById("field_lower").checked;
-	var uppercase = document.getElementById("field_upper").checked;
-	var digits = document.getElementById("field_digits").checked;
-	var special = document.getElementById("field_special").checked;
-	
-	var minimum = 0;
-	
-	if (lowercase){ minimum++; };
-	if (uppercase){ minimum++; };
-	if (digits){ minimum++; };
-	if (special){ minimum++; };
-	
-	document.getElementById("field_length").setAttribute("min", minimum);
-	
-	if(minimum == 0){ minimum++; };
-	
-	return minimum;
-};
-
 function minValue(value) {
-	var min = getMinLength();
-    if(parseInt(value) < min || isNaN(parseInt(value))) {
-    	if(min == 1){
-    		$("#number-is-zero").show().fadeOut(3000);
-    	} else { 
-        	$("#number-too-small-error").show().fadeOut(3000);
-        }
-        return min;
-    } else {
-    	return value;
-    }
+    if(parseInt(value) < 0) {
+		$("#number-is-neg").show();
+	}else{
+		$("#number-is-neg").hide();
+	}
 };
-
-$("#number-too-small-error").hide();
-$("#number-is-zero").hide();
-
-document.getElementById("field_lower").addEventListener("click", getMinLength);
-document.getElementById("field_upper").addEventListener("click", getMinLength);
-document.getElementById("field_digits").addEventListener("click", getMinLength);
-document.getElementById("field_special").addEventListener("click", getMinLength);
 </script>
 
 <form name="pdwGenForm" role="form" novalidate ng-submit="vm.save()" show-validation>
@@ -78,7 +44,7 @@ document.getElementById("field_special").addEventListener("click", getMinLength)
 		<div class="form-group">
             <label class="col-control-label" for="field_length">Length</label>
             <input type="number" class="col-form-control" name="length" id="field_length"
-				   ng-model="vm.genOptions.length" min="0" required onblur="this.value = minValue(this.value)"/>
+				   ng-model="vm.genOptions.length" min="0" required onblur="minValue(this.value)"/>
             <div ng-show="pdwGenForm.length.$invalid">
                 <p class="help-block" ng-show="pdwGenForm.length.$error.required">
                     This field is required.
@@ -86,13 +52,10 @@ document.getElementById("field_special").addEventListener("click", getMinLength)
 				<p class="help-block" ng-show="pdwGenForm.length.$error.number">
                     Not a valid number.
                 </p>
+                <p class="help-block" id="number-is-neg">
+            		Length can't be negative.
+            	</p>
             </div>
-            <p class="help-block" id="number-too-small-error">
-            	Length must be at least this big to allow for requirements.
-            </p>
-            <p class="help-block" id="number-is-zero">
-            	Length must be at least 1.
-            </p>
         </div>
 		<div class="clearfix">
 			<button type="button" ng-click="vm.generate()" ng-disabled="pdwGenForm.$invalid"
