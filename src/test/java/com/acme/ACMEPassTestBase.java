@@ -79,5 +79,19 @@ public abstract class ACMEPassTestBase {
         return driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary"));
     }
 
+    public WebElement findModalCancelButton(){
+
+        return driver.findElement(By.xpath("//button[@data-dismiss='modal']"));
+
+    }
+
+    public boolean isCharRepeated(String input) {
+        for (int i = 1; i < input.length(); ++i){
+            if (input.charAt(i) - input.charAt(i - 1) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

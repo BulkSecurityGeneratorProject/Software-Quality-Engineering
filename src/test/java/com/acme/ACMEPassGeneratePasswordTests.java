@@ -8,21 +8,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static com.acme.Util.generateRandomString;
+import static com.acme.Util.*;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
 public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
 
-    private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
 
     private String username;
@@ -147,6 +142,29 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
        _passwordHelper.deleteGeneratedPassword(site,login,generatedPassword);
     }
 
+    @Test
+    public void generatePasswordCancelDoesNotPutGeneratedPassword() throws  InterruptedException{
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        String password = generateRandomString(_random,32);
+
+        PasswordHelper.PasswordCreationModalHelper modal = _passwordHelper.openPasswordCreationModal();
+        modal.findLoginElement().sendKeys(login);
+        modal.findSiteElement().sendKeys(site);
+        modal.findPasswordElement().sendKeys(password);
+        // generate password
+        clickGenerateButtonFromCreate();
+        clickGenerateFromGenerateModal();
+        String generatedPassword = getPasswordField().getAttribute("value");
+
+        findModalCancelButton().click();
+
+        findModalSaveButton().click();
+        Util.waitUntilModalGone(driver);
+        assertFalse(_passwordHelper.passwordEntryExists(site, login, generatedPassword));
+        assertTrue(_passwordHelper.passwordEntryExists(site, login, password));
+        _passwordHelper.deleteGeneratedPassword(site,login,generatedPassword);
+    }
 
     @Test
     public void generatePasswordWithInputlengthGeneratesCorrectLength() throws InterruptedException{
@@ -195,7 +213,7 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
         //enable non-repeat characters
         driver.findElement(By.xpath("//input[@type='checkbox']")).click();
         clickGenerateFromGenerateModal();
-        assertTrue(isCharRepeated(getPasswordField().getAttribute("value")));
+        assertFalse(isCharRepeated(getPasswordField().getAttribute("value")));
     }
 
     @Test
@@ -203,55 +221,36 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
         String site = generateRandomString(_random, 32);
         String login = generateRandomString(_random, 32);
         openGenerateModal(site, login, null);
-
         assertFalse(getPasswordField().isEnabled());
     }
 
-//    private void deleteGeneratedPassword(String site, String login, String password) throws InterruptedException {
-//        //goto first page.
-//        _passwordHelper.givenOnFirstAcmePassPage();
-//
-//        while(true) {
-//            while(true){
-//                boolean foundPassword = _passwordHelper.getPasswordsOnPage().parallelStream().anyMatch((storedPassword) ->
-//                        Objects.equals(storedPassword.site, site) &&
-//                                Objects.equals(storedPassword.login, login) &&
-//                                Objects.equals(storedPassword.password, password)
-//                );
-//
-//                if (foundPassword) {
-//                    Optional<PasswordHelper.Password> pswd = _passwordHelper.getPasswordsOnPage().parallelStream().filter((passwords) ->
-//                            Objects.equals(passwords.site, site) &&
-//                                    Objects.equals(passwords.login, login) &&
-//                                    Objects.equals(passwords.password, password)).findFirst();
-//                    _passwordHelper.deletePassword(pswd.get());
-//                }
-//                else{
-//                    // No more on this page
-//                    break;
-//                }
-//            }
-//
-//            try {
-//                _passwordHelper.goToNextPage();
-//            } catch (NoSuchElementException e) {
-//                // no more pages to try
-//                System.out.println("Done scanning all pages");
-//                break;
-//            }
-//        }
-//    }
+    @Test
+    public void generatePasswordDoesNotAllowUsertoSpecifyNegativeLength() throws InterruptedException{
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        openGenerateModal(site, login, null);
 
-    public boolean isCharRepeated(String input) {
-        for (int i = 1; i < input.length(); ++i){
-            if (!(input.charAt(i) - input.charAt(i - 1) == 0)) {
-                return true;
-            }
-        }
-        return false;
+        driver.findElement(By.xpath("//input[@type='number']")).clear();
+        driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(_random.nextInt(32)-32));
+
+        assertFalse(driver.findElement(By.cssSelector("div.modal-body > div.clearfix > button.btn.btn-primary")).isEnabled());
+        assertFalse(findModalSaveButton().isEnabled());
     }
 
-    public void openGenerateModal(String site, String login, String password) throws InterruptedException{
+    @Test
+    public void generatePasswordDoesNotAllowUsertoSpecifyZeroLength() throws InterruptedException{
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        openGenerateModal(site, login, null);
+
+        driver.findElement(By.xpath("//input[@type='number']")).clear();
+        driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(0));
+
+        assertFalse(driver.findElement(By.cssSelector("div.modal-body > div.clearfix > button.btn.btn-primary")).isEnabled());
+        assertFalse(findModalSaveButton().isEnabled());
+    }
+
+    private void openGenerateModal(String site, String login, String password) throws InterruptedException{
         PasswordHelper.PasswordCreationModalHelper modal = _passwordHelper.openPasswordCreationModal();
 
         modal.findSiteElement().sendKeys(site);
@@ -260,7 +259,7 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
             modal.findPasswordElement().sendKeys(password);
         clickGenerateButtonFromCreate();
     }
-    public void fillCreatePasswordModal(String site, String login){
+    private void fillCreatePasswordModal(String site, String login){
 
         driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.site']")).clear();
         driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.site']")).sendKeys(site);
@@ -269,7 +268,7 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
         driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.login']")).sendKeys(login);
     }
 
-    public void createPassword(String site, String login, String password) throws InterruptedException{
+    private void createPassword(String site, String login, String password) throws InterruptedException{
 
         PasswordHelper.PasswordCreationModalHelper modal = _passwordHelper.openPasswordCreationModal();
         modal.findSiteElement().clear();
@@ -292,29 +291,4 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
             fail(verificationErrorString);
         }
     }
-
-    private boolean isElementPresent(By by) {
-        try {
-            driver.findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    private boolean isAlertPresent() {
-        try {
-            driver.switchTo().alert();
-            return true;
-        } catch (NoAlertPresentException e) {
-            return false;
-        }
-    }
-
-
-
-
-
-
-
 }

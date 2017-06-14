@@ -1,6 +1,5 @@
 package com.acme;
 
-import com.sun.corba.se.spi.ior.ObjectKey;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,24 +8,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-
-import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.acme.Util.*;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class ACMEPassEditPassword extends ACMEPassTestBase {
 
-    private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
 
     private String username;
@@ -81,14 +72,29 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
         assertEquals(editedPassword.password, password);
     }
 
-    private PasswordHelper.Password getARandomPasswordToEdit() throws InterruptedException{
-        _passwordHelper.givenAPasswordExists();
-        _passwordHelper.givenOnFirstAcmePassPage();
-        List<PasswordHelper.Password> passwords = _passwordHelper.getPasswordsOnPage();
-        PasswordHelper.Password randomPassword = passwords.get(_random.nextInt(passwords.size()));
+    @Test
+    public void editPasswordCancelDoesNotChangePassword() throws InterruptedException{
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        String password = generateRandomString(_random, 32);
 
-        findEditButton(randomPassword.element).click();
-        return randomPassword;
+        PasswordHelper.Password randomPassword = getARandomPasswordToEdit();
+
+        String id = randomPassword.id;
+        String previousSite = randomPassword.site;
+        String previousLogin = randomPassword.login;
+        String previousPassword = randomPassword.password;
+
+        editPassword(site,login,password);
+        findModalCancelButton().click();
+
+        PasswordHelper.Password editedPassword = getPasswordWithId(id).get();
+        assertNotEquals(editedPassword.site, site);
+        assertNotEquals(editedPassword.login, login);
+        assertNotEquals(editedPassword.password, password);
+        assertEquals(editedPassword.site, previousSite);
+        assertEquals(editedPassword.login, previousLogin);
+        assertEquals(editedPassword.password, previousPassword);
     }
 
     @Test
@@ -100,7 +106,7 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
 
     @Test
     public void editPasswordWithEmptySiteFieldFails() throws InterruptedException{
-        PasswordHelper.Password randomPassword = getARandomPasswordToEdit();
+        getARandomPasswordToEdit();
         editPassword(null,generateRandomString(_random, 32),generateRandomString(_random, 32));
         Assert.assertFalse(findModalSaveButton().isEnabled());
     }
@@ -170,9 +176,8 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
         assertEquals(editedPassword.password, generatedPassword);
     }
 
-
     @Test
-    public void editPasswordGenereateWithNonRepeatedCharactersDoesNotRepeatCharacters() throws InterruptedException{
+    public void editPasswordGenerateWithNonRepeatedCharactersDoesNotRepeatCharacters() throws InterruptedException{
         String site = generateRandomString(_random, 32);
         String login = generateRandomString(_random, 32);
         PasswordHelper.Password randomPassword = getARandomPasswordToEdit();
@@ -185,7 +190,7 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
 
         driver.findElement(By.xpath("//input[@type='number']")).clear();
         driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(_random.nextInt(32)));
-        driver.findElement(By.xpath("//input[@type='checkbox']")).click();
+        driver.findElement(By.xpath("//input[@id='field_repetition']")).click();
         clickGenerateFromGenerateModal();
 
         findModalSaveButton().click();
@@ -195,13 +200,58 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
         assertFalse(isCharRepeated(editedPassword.password));
     }
 
+
     @Test
-    public void generatePasswordDoesNotAllowUserToManuallyInputGeneratedPassword() throws InterruptedException{
+    public void EditPasswordGeneratePasswordDoesNotAllowUserToManuallyInputGeneratedPassword() throws InterruptedException{
         getARandomPasswordToEdit();
         clickGenerateButtonFromCreate();
         assertFalse(getPasswordField().isEnabled());
     }
 
+    @Test
+    public void EditPasswordGeneratePasswordDoesNotAllowUserToSpecifyNegativeLength() throws InterruptedException{
+        getARandomPasswordToEdit();
+
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        fillCreatePasswordModal(site,login);
+
+        clickGenerateButtonFromCreate();
+
+        driver.findElement(By.xpath("//input[@type='number']")).clear();
+        driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(_random.nextInt(32)-32));
+
+        assertFalse(driver.findElement(By.cssSelector("div.modal-body > div.clearfix > button.btn.btn-primary")).isEnabled());
+        assertFalse(findModalSaveButton().isEnabled());
+    }
+
+
+    @Test
+    public void EditPasswordGeneratePasswordDoesNotAllowUserToSpecifyZeroLength() throws InterruptedException{
+        getARandomPasswordToEdit();
+
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        fillCreatePasswordModal(site,login);
+
+        clickGenerateButtonFromCreate();
+
+        driver.findElement(By.xpath("//input[@type='number']")).clear();
+        driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(0));
+
+        assertFalse(driver.findElement(By.cssSelector("div.modal-body > div.clearfix > button.btn.btn-primary")).isEnabled());
+        assertFalse(findModalSaveButton().isEnabled());
+    }
+
+    private PasswordHelper.Password getARandomPasswordToEdit() throws InterruptedException{
+        _passwordHelper.givenAPasswordExists();
+        _passwordHelper.givenOnFirstAcmePassPage();
+        List<PasswordHelper.Password> passwords = _passwordHelper.getPasswordsOnPage();
+        PasswordHelper.Password randomPassword = passwords.get(_random.nextInt(passwords.size()));
+
+        findEditButton(randomPassword.element).click();
+        return randomPassword;
+    }
 
     private Optional<PasswordHelper.Password> getPasswordWithId(String id) throws InterruptedException{
         //goto first page.
@@ -225,29 +275,12 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
             }
         }
     }
+
     private WebElement findEditButton(WebElement element){
         return element.findElement(By.xpath(".//button[@ui-sref='acme-pass.edit({id:acmePass.id})']"));
     }
-    @Test
-    public void editPasswordWithlessThanThreeCharactersSiteFails() throws InterruptedException{
 
-    }
-
-    @Test
-    public void editPasswordWithAnyEmptyFiledsFails() throws InterruptedException{
-
-    }
-
-    public boolean isCharRepeated(String input) {
-        for (int i = 1; i < input.length(); ++i){
-            if ((input.charAt(i) - input.charAt(i - 1) == 0)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void fillCreatePasswordModal(String site, String login){
+    private void fillCreatePasswordModal(String site, String login){
 
         driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.site']")).clear();
         driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.site']")).sendKeys(site);
@@ -256,7 +289,7 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
         driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.login']")).sendKeys(login);
     }
 
-    public void editPassword(String site, String login, String password){
+    private void editPassword(String site, String login, String password){
 
         driver.findElement(By.id("field_site")).clear();
         driver.findElement(By.id("field_site")).sendKeys(site);
@@ -275,24 +308,6 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
         String verificationErrorString = verificationErrors.toString();
         if (!"".equals(verificationErrorString)) {
             fail(verificationErrorString);
-        }
-    }
-
-    private boolean isElementPresent(By by) {
-        try {
-            driver.findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    private boolean isAlertPresent() {
-        try {
-            driver.switchTo().alert();
-            return true;
-        } catch (NoAlertPresentException e) {
-            return false;
         }
     }
 }
