@@ -7,19 +7,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static com.acme.Util.generateRandomString;
+import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
 public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
@@ -27,126 +25,261 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
     private boolean acceptNextAlert = true;
     private StringBuffer verificationErrors = new StringBuffer();
 
-    private String browser;
     private String username;
     private String password;
-
+    private PasswordHelper _passwordHelper;
+    private Random _random;
 
     @Parameterized.Parameters
     public static Collection<Object[]> users() {
         return Arrays.asList( new Object[][] {
-                { "firefox", "frank.paul@acme.com", "starwars"},    // Manager
-//                { "firefox", "jo.thomas@acme.com",  "mustang" },    // Employee
-//                { "firefox", "admin@acme.com",      "K-10ficile" }, // Admin
-//                { "firefox",  "frank.paul@acme.com", "starwars"},    // Manager
-//                { "firefox",  "jo.thomas@acme.com",  "mustang" },    // Employee
-//                { "firefox",  "admin@acme.com",      "K-10ficile" }, // Admin
+            { "frank.paul@acme.com", "starwars"}    // Manager
+//            { "jo.thomas@acme.com",  "mustang" },    // Employee
+//            { "admin@acme.com",      "K-10ficile"}, // Admin
+//            { "frank.paul@acme.com", "starwars"},    // Manager
+//            { "jo.thomas@acme.com",  "mustang" },    // Employee
+//            { "admin@acme.com",      "K-10ficile"}, // Admin
         });
     }
 
-    public ACMEPassGeneratePasswordTests(String browser, String username, String password) {
-        this.browser = browser;
+    public ACMEPassGeneratePasswordTests(String username, String password) {
         this.username = username;
         this.password = password;
+        this._random = new Random();
     }
 
     @Before
     public void setUp() throws Exception {
-//        driver = new FirefoxDriver();
         url = "http://localhost:8080/#/";
-        driver = getDriver(browser);
+        driver = getDriver("firefox");
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
         driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
+        _passwordHelper = new  PasswordHelper(new LoginHelper(driver, url),driver, url);
+
         loginWith(username, password);
     }
 
     @Test
     public void createPasswordGoldenPath() throws InterruptedException {
 
-        Thread.sleep(1000);
-        WebElement button = driver.findElement(By.cssSelector("button.btn.btn-primary"));
-        Thread.sleep(1000);
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        String password = generateRandomString( _random, 32);
+        createPassword(site, login, password);
 
-        button.click();
-
-        Thread.sleep(1000);
-
-        createPassword("site.com", "teslogin", "dduude");
+        Assert.assertTrue(findModalSaveButton().isEnabled());
 
         //The 'save' button
-        driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary")).click();
+        findModalSaveButton().click();
+        Util.waitUntilModalGone(driver);
+        assertTrue(_passwordHelper.passwordEntryExists(site,login,password));
 
-        WebElement password = driver.findElement(By.xpath("//input[@type='password']"));
-        Assert.assertNotNull(password);
-        // This doesn't currently work, since the "delete" functionality is broken.
-        driver.findElement(By.xpath("//button[2]")).click();
-        driver.findElement(By.cssSelector("button.btn.btn-danger")).click();
+        _passwordHelper.deleteGeneratedPassword(site,login, password);
     }
 
     @Test
-    public void createPasswordWithlessThanThreeCharacterSiteNameFails() throws InterruptedException{
-        Thread.sleep(1000);
-        WebElement button = driver.findElement(By.cssSelector("button.btn.btn-primary"));
-        Thread.sleep(1000);
-
-        button.click();
-
-        Thread.sleep(1000);
-
-        createPassword("tw", "teslogin", "dduude");
-        Assert.assertFalse(driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary")).isEnabled());
+    public void generatePasswordWithlessThanThreeCharacterSiteNameFails() throws InterruptedException{
+        openGenerateModal(null,null,null);
+        clickGenerateFromGenerateModal();
+        driver.findElement(By.xpath("//input[@type='number']")).clear();
+        driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(_random.nextInt(32)));
+        findModalSaveButton().click();
+        fillCreatePasswordModal(generateRandomString(_random, 2), generateRandomString(_random, 32));
+        Assert.assertFalse(findModalSaveButton().isEnabled());
     }
 
     @Test
-    public void createPasswordWithEmptyFieldFails() throws InterruptedException{
-        Thread.sleep(1000);
-        WebElement button = driver.findElement(By.cssSelector("button.btn.btn-primary"));
-        Thread.sleep(1000);
+    public void generatePasswordWithEmptySiteFieldFails() throws InterruptedException{
+        openGenerateModal(null,null,null);
+        clickGenerateFromGenerateModal();
+        driver.findElement(By.xpath("//input[@type='number']")).clear();
+        driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(_random.nextInt(32)));
+        findModalSaveButton().click();
+        fillCreatePasswordModal( null, generateRandomString(_random, 32));
+        Assert.assertFalse(findModalSaveButton().isEnabled());
+    }
 
-        button.click();
+    @Test
+    public void generatePasswordWithEmptyLoginFieldFails() throws InterruptedException{
+        openGenerateModal(null,null,null);
+        clickGenerateFromGenerateModal();
+        driver.findElement(By.xpath("//input[@type='number']")).clear();
+        driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(_random.nextInt(32)));
+        findModalSaveButton().click();
+        fillCreatePasswordModal( generateRandomString(_random, 32),null);
+        Assert.assertFalse(findModalSaveButton().isEnabled());
+    }
 
-        Thread.sleep(1000);
-
-        createPassword("tw", null, "dduude");
-        Assert.assertFalse(driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary")).isEnabled());
-
-        createPassword(null, "someValue", "dduude");
-        Assert.assertFalse(driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary")).isEnabled());
-
-        createPassword("someSite", "loginVal", null);
-        Assert.assertFalse(driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary")).isEnabled());
-
+    @Test
+    public void generatePasswordWithEmptyPasswordFieldFails() throws InterruptedException{
+        openGenerateModal(null,null,null);
+        clickGenerateFromGenerateModal();
+        driver.findElement(By.xpath("//input[@type='number']")).clear();
+        driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(_random.nextInt(32)));
+        findModalSaveButton().click();
+        fillCreatePasswordModal( generateRandomString(_random, 32),generateRandomString(_random, 32));
+        getPasswordField().clear();
+        Assert.assertFalse(findModalSaveButton().isEnabled());
     }
 
     @Test
     public void generatePasswordGoldenPath() throws InterruptedException{
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+
+        PasswordHelper.PasswordCreationModalHelper modal = _passwordHelper.openPasswordCreationModal();
+        modal.findLoginElement().sendKeys(login);
+        modal.findSiteElement().sendKeys(site);
+        Assert.assertFalse(findModalSaveButton().isEnabled());
+
+        // generate password
+        clickGenerateButtonFromCreate();
+        clickGenerateFromGenerateModal();
+        String generatedPassword = getPasswordField().getAttribute("value");
+
+        findModalSaveButton().click();
+        // Util.waitUntilModalGone(driver);
         Thread.sleep(1000);
-        WebElement button = driver.findElement(By.cssSelector("button.btn.btn-primary"));
-        Thread.sleep(1000);
-
-        button.click();
-
-        Thread.sleep(1000);
-
-        createPassword("tw", "testlogin", null);
-        Assert.assertFalse(driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary")).isEnabled());
-
-        driver.findElement(By.cssSelector("div.modal-body > div.form-group.clearfix > div.col-lg-2 > button.btn.btn-primary")).click();
-
-        //TODO: Finish the default parameter passed, check.
-
+        findModalSaveButton().click();
+        Util.waitUntilModalGone(driver);
+        assertTrue(_passwordHelper.passwordEntryExists(site, login, generatedPassword));
+       _passwordHelper.deleteGeneratedPassword(site,login,generatedPassword);
     }
 
-    public void createPassword(String site, String login, String password){
 
-        driver.findElement(By.id("field_site")).clear();
-        driver.findElement(By.id("field_site")).sendKeys(site);
-        driver.findElement(By.id("field_login")).clear();
-        driver.findElement(By.id("field_login")).sendKeys(login);
-        driver.findElement(By.id("field_password")).clear();
+    @Test
+    public void generatePasswordWithInputlengthGeneratesCorrectLength() throws InterruptedException{
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        PasswordHelper.PasswordCreationModalHelper modal = _passwordHelper.openPasswordCreationModal();
+
+        modal.findSiteElement().sendKeys(site);
+        modal.findLoginElement().sendKeys(login);
+
+        clickGenerateButtonFromCreate();
+        int length = _random.nextInt(32);
+        driver.findElement(By.xpath("//input[@type='number']")).clear();
+        driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(length));
+        clickGenerateFromGenerateModal();
+        String generatedPassword = getPasswordField().getAttribute("value");
+        assertEquals(length, generatedPassword.length());
+    }
+
+    @Test
+    public void generatePasswordOverridesUserInputInPasswordCreateModal() throws InterruptedException{
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        String password = generateRandomString(_random, 32);
+
+        openGenerateModal(site,login,password);
+
+        int length = _random.nextInt(32);
+        driver.findElement(By.xpath("//input[@type='number']")).clear();
+        driver.findElement(By.xpath("//input[@type='number']")).sendKeys(Integer.toString(length));
+        clickGenerateFromGenerateModal();
+        String generatedPassword = getPasswordField().getAttribute("value");
+
+        findModalSaveButton().click();
+        String overridenPassword = getPasswordField().getAttribute("value");
+        assertEquals(generatedPassword, overridenPassword);
+    }
+
+
+    @Test
+    public void generatePasswordWithNonRepeatedCharactersDoesNotRepeatCharacters() throws InterruptedException{
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        openGenerateModal(site, login, null);
+
+        //enable non-repeat characters
+        driver.findElement(By.xpath("//input[@type='checkbox']")).click();
+        clickGenerateFromGenerateModal();
+        assertTrue(isCharRepeated(getPasswordField().getAttribute("value")));
+    }
+
+    @Test
+    public void generatePasswordDoesNotAllowUserToManuallyInputGeneratedPassword() throws InterruptedException{
+        String site = generateRandomString(_random, 32);
+        String login = generateRandomString(_random, 32);
+        openGenerateModal(site, login, null);
+
+        assertFalse(getPasswordField().isEnabled());
+    }
+
+//    private void deleteGeneratedPassword(String site, String login, String password) throws InterruptedException {
+//        //goto first page.
+//        _passwordHelper.givenOnFirstAcmePassPage();
+//
+//        while(true) {
+//            while(true){
+//                boolean foundPassword = _passwordHelper.getPasswordsOnPage().parallelStream().anyMatch((storedPassword) ->
+//                        Objects.equals(storedPassword.site, site) &&
+//                                Objects.equals(storedPassword.login, login) &&
+//                                Objects.equals(storedPassword.password, password)
+//                );
+//
+//                if (foundPassword) {
+//                    Optional<PasswordHelper.Password> pswd = _passwordHelper.getPasswordsOnPage().parallelStream().filter((passwords) ->
+//                            Objects.equals(passwords.site, site) &&
+//                                    Objects.equals(passwords.login, login) &&
+//                                    Objects.equals(passwords.password, password)).findFirst();
+//                    _passwordHelper.deletePassword(pswd.get());
+//                }
+//                else{
+//                    // No more on this page
+//                    break;
+//                }
+//            }
+//
+//            try {
+//                _passwordHelper.goToNextPage();
+//            } catch (NoSuchElementException e) {
+//                // no more pages to try
+//                System.out.println("Done scanning all pages");
+//                break;
+//            }
+//        }
+//    }
+
+    public boolean isCharRepeated(String input) {
+        for (int i = 1; i < input.length(); ++i){
+            if (!(input.charAt(i) - input.charAt(i - 1) == 0)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void openGenerateModal(String site, String login, String password) throws InterruptedException{
+        PasswordHelper.PasswordCreationModalHelper modal = _passwordHelper.openPasswordCreationModal();
+
+        modal.findSiteElement().sendKeys(site);
+        modal.findLoginElement().sendKeys(login);
         if(password != null)
-            driver.findElement(By.id("field_password")).sendKeys(password);
+            modal.findPasswordElement().sendKeys(password);
+        clickGenerateButtonFromCreate();
+    }
+    public void fillCreatePasswordModal(String site, String login){
+
+        driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.site']")).clear();
+        driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.site']")).sendKeys(site);
+
+        driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.login']")).clear();
+        driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.login']")).sendKeys(login);
+    }
+
+    public void createPassword(String site, String login, String password) throws InterruptedException{
+
+        PasswordHelper.PasswordCreationModalHelper modal = _passwordHelper.openPasswordCreationModal();
+        modal.findSiteElement().clear();
+        modal.findSiteElement().sendKeys(site);
+        modal.findLoginElement().clear();
+        modal.findLoginElement().sendKeys(login);
+        if(password != null){
+            modal.findPasswordElement().clear();
+            modal.findPasswordElement().sendKeys(password);
+        }
     }
 
     @After
@@ -177,19 +310,11 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
             return false;
         }
     }
-//
-//    private String closeAlertAndGetItsText() {
-//        try {
-//            Alert alert = driver.switchTo().alert();
-//            String alertText = alert.getText();
-//            if (acceptNextAlert) {
-//                alert.accept();
-//            } else {
-//                alert.dismiss();
-//            }
-//            return alertText;
-//        } finally {
-//            acceptNextAlert = true;
-//        }
-//    }
+
+
+
+
+
+
+
 }
