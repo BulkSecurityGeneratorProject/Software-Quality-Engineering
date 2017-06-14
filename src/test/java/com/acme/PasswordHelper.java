@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.acme.Util.*;
 
@@ -183,4 +184,40 @@ public class PasswordHelper {
             return _driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.password']"));
         }
     }
+
+    public void deleteGeneratedPassword(String site, String login, String password) throws InterruptedException {
+        //goto first page.
+        givenOnFirstAcmePassPage();
+
+        while(true) {
+            while(true){
+                boolean foundPassword = getPasswordsOnPage().parallelStream().anyMatch((storedPassword) ->
+                        Objects.equals(storedPassword.site, site) &&
+                                Objects.equals(storedPassword.login, login) &&
+                                Objects.equals(storedPassword.password, password)
+                );
+
+                if (foundPassword) {
+                    Optional<Password> pswd = getPasswordsOnPage().parallelStream().filter((passwords) ->
+                            Objects.equals(passwords.site, site) &&
+                                    Objects.equals(passwords.login, login) &&
+                                    Objects.equals(passwords.password, password)).findFirst();
+                    deletePassword(pswd.get());
+                }
+                else{
+                    // No more on this page
+                    break;
+                }
+            }
+
+            try {
+                goToNextPage();
+            } catch (NoSuchElementException e) {
+                // no more pages to try
+                System.out.println("Done scanning all pages");
+                break;
+            }
+        }
+    }
+
 }
