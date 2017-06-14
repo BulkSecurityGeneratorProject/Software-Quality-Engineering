@@ -18,6 +18,7 @@ public abstract class ACMEPassTestBase {
     protected WebDriver driver;
     protected String url;
 
+    // No longer needed because we're using firefox
     public WebDriver getDriver(String browser) {
         if (browser.equals("firefox")) {
             WebDriver driver = new FirefoxDriver();
@@ -34,6 +35,7 @@ public abstract class ACMEPassTestBase {
         driver.get(url);
         if (!username.isEmpty() && !password.isEmpty()) {
             // Sign in button
+            Thread.sleep(500);
             driver.findElement(By.id("login")).click();
             Thread.sleep(500);
 

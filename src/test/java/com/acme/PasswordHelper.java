@@ -122,8 +122,12 @@ public class PasswordHelper {
         return passwords;
     }
 
-    public void deletePassword(Password password) {
+    public void openDeletePasswordModal(Password password) {
         password.element.findElement(By.xpath(".//button[@ui-sref='acme-pass.delete({id:acmePass.id})']")).click();
+    }
+
+    public void deletePassword(Password password) {
+        openDeletePasswordModal(password);
         confirmModal(_driver);
     }
 

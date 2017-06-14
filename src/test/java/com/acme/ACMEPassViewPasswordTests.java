@@ -37,9 +37,6 @@ public class ACMEPassViewPasswordTests extends ACMEPassTestBase {
                 { "firefox", "frank.paul@acme.com", "starwars"},    // Manager
                 { "firefox", "jo.thomas@acme.com",  "mustang" },    // Employee
                 { "firefox", "admin@acme.com",      "K-10ficile" }, // Admin
-                { "chrome",  "frank.paul@acme.com", "starwars"},    // Manager
-                { "chrome",  "jo.thomas@acme.com",  "mustang" },    // Employee
-                { "chrome",  "admin@acme.com",      "K-10ficile" }, // Admin
         });
     }
 
@@ -55,8 +52,6 @@ public class ACMEPassViewPasswordTests extends ACMEPassTestBase {
         url = "http://localhost:8080/#/";
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
-        driver = getDriver(browser);
-
         loginWith(username, password);
     }
 
@@ -68,9 +63,7 @@ public class ACMEPassViewPasswordTests extends ACMEPassTestBase {
         Thread.sleep(1000);
         WebElement button = driver.findElement(By.cssSelector("button.btn.btn-primary"));
         Thread.sleep(1000);
-
         button.click();
-
         Thread.sleep(1000);
 
         driver.findElement(By.id("field_site")).clear();
@@ -81,26 +74,54 @@ public class ACMEPassViewPasswordTests extends ACMEPassTestBase {
         driver.findElement(By.id("field_password")).sendKeys("test_password");
         driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary")).click();
 
+        Util.waitUntilModalGone(driver);
         Thread.sleep(500);
+
         // Password starts out hidden
-        WebElement password = driver.findElement(By.xpath("//input[@type='password']"));
-        Assert.assertNotNull(password);
+        Assert.assertTrue(Util.exists(driver, By.xpath("//input[@type='password']")));
+
         // Click button to toggle visibility
         driver.findElement(By.cssSelector("span.glyphicon.glyphicon-eye-open")).click();
 
         // Password field should have type value of "text" now
-        password = driver.findElement(By.xpath("//input[@type='text']"));
-        Assert.assertNotNull(password);
+        Assert.assertTrue(Util.exists(driver, By.xpath("//input[@type='text']")));
 
         // Toggle back
         driver.findElement(By.cssSelector("span.glyphicon.glyphicon-eye-open")).click();
-        password = driver.findElement(By.xpath("//input[@type='password']"));
-        Assert.assertNotNull(password);
+        Assert.assertTrue(Util.exists(driver, By.xpath("//input[@type='password']")));
 
-        // Cleanup: remove the acmepass entry we created.
-        // This doesn't currently work, since the "delete" functionality is broken.
+        // Delete item we created
         driver.findElement(By.xpath("//button[2]")).click();
+        Thread.sleep(500);
         driver.findElement(By.cssSelector("button.btn.btn-danger")).click();
+    }
+
+    @Test
+    public void testMakePasswordVisibleDialog() throws InterruptedException {
+
+        Thread.sleep(1000);
+        WebElement button = driver.findElement(By.cssSelector("button.btn.btn-primary"));
+        Thread.sleep(1000);
+        button.click();
+        Thread.sleep(1000);
+
+        driver.findElement(By.id("field_password")).clear();
+        driver.findElement(By.id("field_password")).sendKeys("test_password");
+
+        Assert.assertTrue(Util.exists(driver, By.xpath("//input[@type='password']")));
+
+        // Click button to toggle visibility
+        driver.findElement(By.cssSelector("span.glyphicon.glyphicon-eye-open")).click();
+
+        // Password field should have type value of "text" now
+        Assert.assertTrue(Util.exists(driver, By.xpath("//input[@type='text']")));
+
+        // Toggle back
+        driver.findElement(By.cssSelector("span.glyphicon.glyphicon-eye-open")).click();
+        Assert.assertTrue(Util.exists(driver, By.xpath("//input[@type='password']")));
+
+        // Cancel
+        driver.findElement(By.cssSelector("button.btn.btn-primary"));
     }
 
     @After
