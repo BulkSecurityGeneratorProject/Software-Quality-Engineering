@@ -61,14 +61,20 @@ public class ACMEPassSortingTests extends ACMEPassTestBase {
     @Parameterized.Parameters
     public static Collection<Object[]> users() {
         return Arrays.asList( new Object[][] {
-                //{ "firefox", "frank.paul@acme.com", "starwars"},    // Manager
-                //{ "firefox", "jo.thomas@acme.com",  "mustang" },    // Employee
+                { "firefox", "frank.paul@acme.com", "starwars"},    // Manager
+                { "firefox", "jo.thomas@acme.com",  "mustang" },    // Employee
                 { "firefox", "admin@acme.com",      "K-10ficile" }, // Admin
         });
     }
 
     @Test
     public void sortingTest() throws InterruptedException {
+        PasswordHelper helper = new PasswordHelper(new LoginHelper(driver, url), driver, url);
+        if (!helper.aPasswordExists()) {
+            helper.createPassword("acme.com", "admin", "password");
+            helper.createPassword("bacme.com", "badmin", "qassword");
+        }
+
         testSort(ID_INDEX);
         testSort(SITE_INDEX);
         testSort(PASSWORD_INDEX);
@@ -126,7 +132,6 @@ public class ACMEPassSortingTests extends ACMEPassTestBase {
             if (index != PASSWORD_INDEX) {
                 items.add(rowItems.get(index).getText());
             } else {
-                String a = rowItems.get(index).findElement(By.xpath(".//input")).getAttribute("value");
                 items.add(rowItems.get(index).findElement(By.xpath(".//input")).getAttribute("value"));
             }
         }
