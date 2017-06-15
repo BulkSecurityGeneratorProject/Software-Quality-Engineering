@@ -61,9 +61,9 @@ public class ACMEPassSortingTests extends ACMEPassTestBase {
     @Parameterized.Parameters
     public static Collection<Object[]> users() {
         return Arrays.asList( new Object[][] {
-                //{ "firefox", "frank.paul@acme.com", "starwars"},    // Manager
+                { "firefox", "frank.paul@acme.com", "starwars"},    // Manager
                 { "firefox", "jo.thomas@acme.com",  "mustang" },    // Employee
-                //{ "firefox", "admin@acme.com",      "K-10ficile" }, // Admin
+                { "firefox", "admin@acme.com",      "K-10ficile" }, // Admin
         });
     }
 
