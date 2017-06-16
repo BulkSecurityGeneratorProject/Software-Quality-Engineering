@@ -41,9 +41,9 @@
                 if (sortByPassword) {
                     sortAscending = queries.search("sort=password,asc") >= 0;
                     if (sortAscending) {
-                        data.sort(function(a,b) {return (a.password < b.password) ? 1 : ((b.password < a.password) ? -1 : 0);} );
+                        data.sort(function(a,b) {return (a.password.toLowerCase() < b.password.toLowerCase()) ? 1 : ((b.password.toLowerCase() < a.password.toLowerCase()) ? -1 : 0);} );
                     } else {
-                        data.sort(function(a,b) {return (a.password > b.password) ? 1 : ((b.password > a.password) ? -1 : 0);} );
+                        data.sort(function(a,b) {return (a.password.toLowerCase() > b.password.toLowerCase()) ? 1 : ((b.password.toLowerCase() > a.password.toLowerCase()) ? -1 : 0);} );
                     }
                 }
                 vm.links = ParseLinks.parse(headers('link'));

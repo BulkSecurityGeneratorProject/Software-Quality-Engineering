@@ -85,10 +85,10 @@ public class ACMEPassSortingTests extends ACMEPassTestBase {
 
     @After
     public void tearDown() throws Exception {
-        driver.quit();
+        //driver.quit();
     }
 
-    private void testSort(int id) {
+    private void testSort(int id) throws InterruptedException {
         // Ensure in ascending order mode
         driver.findElement(By.xpath("//table/thead/tr/th[" + id + "]")).click();
         try {
@@ -130,9 +130,10 @@ public class ACMEPassSortingTests extends ACMEPassTestBase {
         for (int i = 1; i < rows.size(); i++) {
             List<WebElement> rowItems = rows.get(i).findElements(By.xpath("//tr[" + i + "]/td"));
             if (index != PASSWORD_INDEX) {
-                items.add(rowItems.get(index).getText());
+                items.add(rowItems.get(index).getText().toLowerCase());
+                System.out.println("Got " + rowItems.get(index).getText());
             } else {
-                items.add(rowItems.get(index).findElement(By.xpath(".//input")).getAttribute("value"));
+                items.add(rowItems.get(index).findElement(By.xpath(".//input")).getAttribute("value").toLowerCase());
             }
         }
         return items;
