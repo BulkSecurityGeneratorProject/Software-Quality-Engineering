@@ -47,7 +47,7 @@ public class ACMEPassSortingTests extends ACMEPassTestBase {
 
         driver = getDriver(browser);
 
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
         loginWith(user, password);
     }
