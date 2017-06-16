@@ -66,6 +66,7 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
 
         editPassword(site,login,password);
         findModalSaveButton().click();
+        waitUntilModalGone(driver);
         PasswordHelper.Password editedPassword = getPasswordWithId(id).get();
         assertEquals(editedPassword.site, site);
         assertEquals(editedPassword.login, login);
@@ -166,6 +167,7 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
         String generatedPassword = getPasswordField().getAttribute("value");
 
         findModalSaveButton().click();
+        Thread.sleep(1000);
         String overridenPassword = getPasswordField().getAttribute("value");
         assertNotEquals(previousPassword, overridenPassword);
         assertEquals(generatedPassword, overridenPassword);
@@ -194,6 +196,7 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
         clickGenerateFromGenerateModal();
 
         findModalSaveButton().click();
+        Thread.sleep(1000);
         findModalSaveButton().click();
         waitUntilModalGone(driver);
         PasswordHelper.Password editedPassword  = getPasswordWithId(id).get();
@@ -280,8 +283,8 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
         return element.findElement(By.xpath(".//button[@ui-sref='acme-pass.edit({id:acmePass.id})']"));
     }
 
-    private void fillCreatePasswordModal(String site, String login){
-
+    private void fillCreatePasswordModal(String site, String login) throws InterruptedException{
+        Thread.sleep(1000);
         driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.site']")).clear();
         driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.site']")).sendKeys(site);
 
@@ -289,15 +292,16 @@ public class ACMEPassEditPassword extends ACMEPassTestBase {
         driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.login']")).sendKeys(login);
     }
 
-    private void editPassword(String site, String login, String password){
+    private void editPassword(String site, String login, String password) throws InterruptedException{
+        Thread.sleep(1000);
+        driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.site']")).clear();
+        driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.site']")).sendKeys(site);
 
-        driver.findElement(By.id("field_site")).clear();
-        driver.findElement(By.id("field_site")).sendKeys(site);
-        driver.findElement(By.id("field_login")).clear();
-        driver.findElement(By.id("field_login")).sendKeys(login);
-        driver.findElement(By.id("field_password")).clear();
+        driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.login']")).clear();
+        driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.login']")).sendKeys(login);
+        driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.password']")).clear();
         if(password != null)
-            driver.findElement(By.id("field_password")).sendKeys(password);
+            driver.findElement(By.xpath("//input[@ng-model='vm.acmePass.password']")).sendKeys(password);
     }
 
     @After
