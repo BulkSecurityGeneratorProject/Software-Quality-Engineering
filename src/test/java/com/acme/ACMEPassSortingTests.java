@@ -85,7 +85,7 @@ public class ACMEPassSortingTests extends ACMEPassTestBase {
 
     @After
     public void tearDown() throws Exception {
-        //driver.quit();
+        driver.quit();
     }
 
     private void testSort(int id) throws InterruptedException {
