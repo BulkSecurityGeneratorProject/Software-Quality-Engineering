@@ -203,17 +203,19 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
         assertEquals(generatedPassword, overridenPassword);
     }
 
-
     @Test
     public void generatePasswordWithNonRepeatedCharactersDoesNotRepeatCharacters() throws InterruptedException{
+
         String site = generateRandomString(_random, 32);
         String login = generateRandomString(_random, 32);
         openGenerateModal(site, login, null);
 
         //enable non-repeat characters
-        driver.findElement(By.xpath("//input[@type='checkbox']")).click();
-        clickGenerateFromGenerateModal();
-        assertFalse(isCharRepeated(getPasswordField().getAttribute("value")));
+        driver.findElement(By.xpath("//input[@id='field_repetition']")).click();
+        for(int i=0; i <250; i++) {
+            clickGenerateFromGenerateModal();
+            assertFalse(isCharRepeated(getPasswordField().getAttribute("value")));
+        }
     }
 
     @Test
