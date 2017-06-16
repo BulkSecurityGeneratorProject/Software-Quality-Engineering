@@ -131,7 +131,6 @@ public class ACMEPassSortingTests extends ACMEPassTestBase {
             List<WebElement> rowItems = rows.get(i).findElements(By.xpath("//tr[" + i + "]/td"));
             if (index != PASSWORD_INDEX) {
                 items.add(rowItems.get(index).getText().toLowerCase());
-                System.out.println("Got " + rowItems.get(index).getText());
             } else {
                 items.add(rowItems.get(index).findElement(By.xpath(".//input")).getAttribute("value").toLowerCase());
             }
