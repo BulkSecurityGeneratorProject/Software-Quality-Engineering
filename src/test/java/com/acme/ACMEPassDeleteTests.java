@@ -23,7 +23,7 @@ public class ACMEPassDeleteTests extends ACMEPassTestBase {
         String rootUrl = "http://localhost:8080/#/";
 
         _driver = getDriver("firefox");
-        _driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+        _driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         _passwordHelper = new PasswordHelper(new LoginHelper(_driver, rootUrl), _driver, rootUrl);
         _random = new Random();
     }

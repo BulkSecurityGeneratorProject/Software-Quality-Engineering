@@ -23,7 +23,7 @@ public class ACMEPassViewTest extends ACMEPassTestBase {
 
         driver = getDriver("firefox");
 
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
         passwordHelper = new PasswordHelper(new LoginHelper(driver, url), driver, url);
         random = new Random();
