@@ -54,25 +54,7 @@ public class ACMEPassGeneratePasswordTests extends ACMEPassTestBase {
 
         loginWith(username, password);
     }
-
-    @Test
-    public void createPasswordGoldenPath() throws InterruptedException {
-
-        String site = generateRandomString(_random, 32);
-        String login = generateRandomString(_random, 32);
-        String password = generateRandomString( _random, 32);
-        createPassword(site, login, password);
-
-        Assert.assertTrue(findModalSaveButton().isEnabled());
-
-        //The 'save' button
-        findModalSaveButton().click();
-        Util.waitUntilModalGone(driver);
-        assertTrue(_passwordHelper.passwordEntryExists(site,login,password));
-
-        _passwordHelper.deleteGeneratedPassword(site,login, password);
-    }
-
+    
     @Test
     public void generatePasswordWithlessThanThreeCharacterSiteNameFails() throws InterruptedException{
         openGenerateModal(null,null,null);
