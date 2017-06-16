@@ -30,7 +30,7 @@ public class ACMEPassViewTest extends ACMEPassTestBase {
     }
 
     @Test
-    public void sortingTest() throws InterruptedException {
+    public void viewTest() throws InterruptedException {
         if (!passwordHelper.aPasswordExists()) {
             passwordHelper.createPassword("acme.com", "admin", "password");
             passwordHelper.createPassword("bacme.com", "badmin", "qassword");
