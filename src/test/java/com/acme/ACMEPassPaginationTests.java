@@ -39,7 +39,7 @@ public class ACMEPassPaginationTests extends ACMEPassTestBase{
     	nextPageButton.click();
     	
     	Thread.sleep(500);
-
+    	
     	String info = getInfoString();
     	assertEquals("Showing 0 - 0 of 0 items.", info);
     }
@@ -218,13 +218,15 @@ public class ACMEPassPaginationTests extends ACMEPassTestBase{
 	
 	private void ensureCorrectNumberOfEntries(int desiredNumber) throws Exception{
 		int currentNumber = getTotalNumberOfEntries();
-		int changeNeeded = desiredNumber - currentNumber;
+		int changeNeeded;
 		
 		if (currentNumber < desiredNumber){
+			changeNeeded = desiredNumber - currentNumber;
 			addEntries(changeNeeded);
 		}
 		
 		if (currentNumber > desiredNumber) {
+			changeNeeded = currentNumber - desiredNumber;
 			removeEntries(changeNeeded);
 		}
 		
@@ -254,7 +256,6 @@ public class ACMEPassPaginationTests extends ACMEPassTestBase{
 	
 	private void removeEntries(int numberOfEntries) throws Exception{
 		List<WebElement> rows = driver.findElements(By.cssSelector("button[ui-sref='acme-pass.delete({id:acmePass.id})']"));
-		numberOfEntries = rows.size() - 1;
 		
 		for(int i=0; i<numberOfEntries; i++){
 			int indexNumber = rows.size() - 1;

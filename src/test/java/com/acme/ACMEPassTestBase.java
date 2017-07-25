@@ -50,7 +50,6 @@ public abstract class ACMEPassTestBase {
                     submit = button;
                 }
             }
-
             submit.click();
 
             Thread.sleep(500);
@@ -62,6 +61,37 @@ public abstract class ACMEPassTestBase {
 
         acmepass.click();
         Thread.sleep(500);
+    }
+
+    public WebElement getPasswordField(){
+        return driver.findElement(By.xpath("//input[@name='password']"));
+    }
+
+    public void clickGenerateButtonFromCreate() {
+        driver.findElement(By.cssSelector("div.modal-body > div.form-group.clearfix > div.col-lg-2 > button.btn.btn-primary")).click();
+    }
+
+    public void clickGenerateFromGenerateModal() {
+        driver.findElement(By.cssSelector("div.modal-body > div.clearfix > button.btn.btn-primary")).click();
+    }
+
+    public WebElement findModalSaveButton(){
+        return driver.findElement(By.cssSelector("div.modal-footer > button.btn.btn-primary"));
+    }
+
+    public WebElement findModalCancelButton(){
+
+        return driver.findElement(By.xpath("//button[@data-dismiss='modal']"));
+
+    }
+
+    public boolean isCharRepeated(String input) {
+        for (int i = 1; i < input.length(); ++i){
+            if (input.charAt(i) - input.charAt(i - 1) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
