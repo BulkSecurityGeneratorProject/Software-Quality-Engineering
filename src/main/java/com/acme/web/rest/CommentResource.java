@@ -7,6 +7,8 @@ import com.acme.repository.CommentRepository;
 import com.acme.web.rest.util.HeaderUtil;
 import io.swagger.annotations.ApiParam;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +64,7 @@ public class CommentResource {
 
 	private String sanitize(String comment) {
 		StringBuilder sb = new StringBuilder();
-
+		comment = Jsoup.clean(comment, Whitelist.none());
 		Pattern pattern = Pattern.compile("(.*?)\\[(b|i|url)\\](.*?)\\[\\/\\2\\]((.|\\n)*)");
 
 		String unsanitized = comment;

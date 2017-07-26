@@ -10,6 +10,8 @@ import com.acme.web.rest.util.HeaderUtil;
 import com.acme.web.rest.util.PaginationUtil;
 
 import io.swagger.annotations.ApiParam;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -58,7 +60,7 @@ public class BlogPostResource {
 		if (blogPost.getId() != null) {
 			return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("blogPost", "idexists", "A new blogPost cannot already have an ID")).body(null);
 		}
-
+		blogPost.setContent(Jsoup.clean(blogPost.getContent(), Whitelist.none()));
 		BlogPost result = blogPostRepository.save(blogPost);
 		return ResponseEntity.created(new URI("/api/blog-posts/" + result.getId()))
 			.headers(HeaderUtil.createEntityCreationAlert("blogPost", result.getId().toString()))
@@ -82,6 +84,7 @@ public class BlogPostResource {
 		if (blogPost.getId() == null) {
 			return createBlogPost(blogPost);
 		}
+		blogPost.setContent(Jsoup.clean(blogPost.getContent(), Whitelist.none()));
 		BlogPost result = blogPostRepository.save(blogPost);
 		return ResponseEntity.ok()
 			.headers(HeaderUtil.createEntityUpdateAlert("blogPost", blogPost.getId().toString()))

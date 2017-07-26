@@ -22,6 +22,7 @@ public class MediaFileService {
 	}
 
 	public File getMediaFile(String fileName) {
+		System.out.println("I am trying to access filename: " + fileName);
 		File file = new File(MEDIA_FOLDER + fileName);
 
 		if (file.exists() && file.canRead() && file.isFile()) {
