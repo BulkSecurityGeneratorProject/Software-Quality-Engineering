@@ -81,11 +81,19 @@ public class ACMEPassService {
 	@Transactional(readOnly = true)
 	public ACMEPassDTO findOne(Long id) {
 		log.debug("Request to get ACMEPass : {}", id);
+<<<<<<< HEAD
+		ACMEPass password = acmePassRepository.findOne(id);
+		if (password.getUser().getEmail().equals(SecurityUtils.getCurrentUser())) {
+			return new ACMEPassDTO(password);
+		} else {
+			return null;
+=======
 		ACMEPass acmePass = acmePassRepository.findOne(id);
 		if (acmePass.getUser().getEmail().equals(SecurityUtils.getCurrentUser())) {
 			return new ACMEPassDTO(acmePass);
 		} else {
 			throw new RuntimeException("You are not allowed to access this ACMEPass.");
+>>>>>>> f18425ca6b86a1e65b809d355354f439f05c0163
 		}
 	}
 
