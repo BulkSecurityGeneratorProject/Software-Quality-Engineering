@@ -2,13 +2,15 @@ package com.acme.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Path;
 
 @Service
 public class MediaFileService {
@@ -24,6 +26,13 @@ public class MediaFileService {
 	public File getMediaFile(String fileName) {
 		System.out.println("I am trying to access filename: " + fileName);
 		File file = new File(MEDIA_FOLDER + fileName);
+
+		java.nio.file.Path mediaPath = Paths.get(MEDIA_FOLDER).normalize().toAbsolutePath();
+		java.nio.file.Path filePath = Paths.get(file.getAbsolutePath()).normalize().toAbsolutePath();
+
+		if (!filePath.startsWith(mediaPath) || filePath.compareTo(mediaPath) == 0) {
+			return null;
+		}
 
 		if (file.exists() && file.canRead() && file.isFile()) {
 			return file;
