@@ -16,13 +16,10 @@ import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Properties;
 
 @ComponentScan
 @EnableAutoConfiguration(exclude = {MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class})
@@ -74,22 +71,5 @@ public class AcmeApp {
 			env.getProperty("server.port"),
 			InetAddress.getLocalHost().getHostAddress(),
 			env.getProperty("server.port"));
-
-		// Test getting value from properties file.
-		String name = "encrypt.properties";
-		Properties props = new Properties();
-
-		InputStream inputStream = AcmeApp.class.getClassLoader().getResourceAsStream(name);
-		if (inputStream != null) {
-			try {
-				props.load(inputStream);
-			} catch (IOException e) {
-				log.debug("Error occurred.");
-			}
-		} else {
-			log.debug("Could not find " + name);
-		}
-
-		log.debug(props.getProperty("key"));
 	}
 }
