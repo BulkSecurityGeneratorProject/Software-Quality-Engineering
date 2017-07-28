@@ -19,6 +19,10 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.xml.bind.DatatypeConverter;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * A ACMEPass.
  */
@@ -28,10 +32,6 @@ import javax.xml.bind.DatatypeConverter;
 public class ACMEPass extends AbstractDatedEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	private static final Key k = new SecretKeySpec(new byte[]{(byte) 0x21, (byte) 0x9e, (byte) 0x48, (byte) 0xd7,
-		(byte) 0x50, (byte) 0x49, (byte) 0x1d, (byte) 0x8c, (byte) 0x1e, (byte) 0x37,
-		(byte) 0x28, (byte) 0xaf, (byte) 0xcc, (byte) 0xfd, (byte) 0x9e, (byte) 0xc7}, "AES");
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -91,6 +91,7 @@ public class ACMEPass extends AbstractDatedEntity implements Serializable {
 	public String getPassword() {
 		if (password != null) {
 			try {
+				Key k = this.getKey();
 				Cipher c = Cipher.getInstance("AES");
 				c.init(Cipher.DECRYPT_MODE, k);
 				return new String(c.doFinal(DatatypeConverter.parseBase64Binary(password)));
@@ -109,6 +110,7 @@ public class ACMEPass extends AbstractDatedEntity implements Serializable {
 
 	public void setPassword(String password) {
 		try {
+			Key k = this.getKey();
 			Cipher c = Cipher.getInstance("AES");
 			c.init(Cipher.ENCRYPT_MODE, k);
 			this.password = DatatypeConverter.printBase64Binary(c.doFinal(password.getBytes()));
@@ -161,5 +163,36 @@ public class ACMEPass extends AbstractDatedEntity implements Serializable {
 			+ ", createdDate='" + createdDate + "'"
 			+ ", lastModifiedDate='" + lastModifiedDate + "'"
 			+ '}';
+	}
+	
+	private Key getKey(){
+		String name = "encrypt.properties";
+		Properties props = new Properties();
+
+		InputStream inputStream = ACMEPass.class.getClassLoader().getResourceAsStream(name);
+		if (inputStream != null) {
+			try {
+				props.load(inputStream);
+			} catch (IOException e) {
+				System.out.println("Error occurred.");
+			}
+		} else {
+			System.out.println("Could not find " + name);
+		}
+
+		String key = props.getProperty("key");
+		byte[] byteArray = hexStringToByteArray(key);
+		
+		return new SecretKeySpec(byteArray, "AES");
+	}
+	
+	private static byte[] hexStringToByteArray(String s) {
+	    int len = s.length();
+	    byte[] data = new byte[len / 2];
+	    for (int i = 0; i < len; i += 2) {
+	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+	                             + Character.digit(s.charAt(i+1), 16));
+	    }
+	    return data;
 	}
 }
