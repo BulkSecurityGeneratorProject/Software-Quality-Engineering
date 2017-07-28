@@ -175,6 +175,12 @@ public class ACMEPass extends AbstractDatedEntity implements Serializable {
 				props.load(inputStream);
 			} catch (IOException e) {
 				System.out.println("Error occurred.");
+			} finally {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					System.out.println("Error occurred.");
+				}
 			}
 		} else {
 			System.out.println("Could not find " + name);
