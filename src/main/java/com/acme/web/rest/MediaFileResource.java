@@ -15,6 +15,7 @@ import java.net.URLDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,6 +50,7 @@ public class MediaFileResource {
 		method = RequestMethod.POST,
 		produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
+	@PreAuthorize("hasAnyAuthority({'ADMIN', 'MANAGER', 'EMPLOYEE'})")
 	public ResponseEntity<?> saveFile(@RequestParam("file") MultipartFile file) throws URISyntaxException, IOException {
 		log.debug("REST request to upload media file");
 
@@ -67,6 +69,7 @@ public class MediaFileResource {
 	@RequestMapping(value = "/mediaFiles/{fileName:.+}",
 		method = RequestMethod.GET)
 	@Timed
+	@PreAuthorize("hasAnyAuthority({'ADMIN', 'MANAGER', 'EMPLOYEE'})")
 	public void getFile(@PathVariable String fileName, HttpServletResponse response) throws IOException {
 		fileName = URLDecoder.decode(fileName, "UTF-8");
 
@@ -99,6 +102,7 @@ public class MediaFileResource {
 	 */
 	@GetMapping("/mediaFiles")
 	@Timed
+	@PreAuthorize("hasAnyAuthority({'ADMIN', 'MANAGER', 'EMPLOYEE'})")
 	public ResponseEntity<List<MediaFileDTO>> getAllFiles() {
 		log.debug("REST request to get a page of Comments");
 
@@ -117,6 +121,7 @@ public class MediaFileResource {
 	 */
 	@DeleteMapping("/mediaFiles/{fileName:.+}")
 	@Timed
+	@PreAuthorize("hasAnyAuthority({'ADMIN', 'MANAGER', 'EMPLOYEE'})")
 	public ResponseEntity<Void> deleteComment(@PathVariable String fileName) throws UnsupportedEncodingException {
 		fileName = URLDecoder.decode(fileName, "UTF-8");
 

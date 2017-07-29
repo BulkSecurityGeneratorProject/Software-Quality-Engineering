@@ -50,6 +50,13 @@ public class MediaFileService {
 	public boolean deleteMediaFile(String fileName) {
 		File file = new File(MEDIA_FOLDER + fileName);
 
+		java.nio.file.Path mediaPath = Paths.get(MEDIA_FOLDER).normalize().toAbsolutePath();
+		java.nio.file.Path filePath = Paths.get(file.getAbsolutePath()).normalize().toAbsolutePath();
+
+		if (!filePath.startsWith(mediaPath) || filePath.compareTo(mediaPath) == 0) {
+			return false;
+		}
+
 		return file.exists() && file.canWrite() && file.delete();
 	}
 }
