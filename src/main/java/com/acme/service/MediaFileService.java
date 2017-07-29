@@ -44,6 +44,13 @@ public class MediaFileService {
 	public void saveMediaFile(MultipartFile multiPartFile) throws IOException {
 		File file = new File(MEDIA_FOLDER + multiPartFile.getOriginalFilename());
 
+		java.nio.file.Path mediaPath = Paths.get(MEDIA_FOLDER).normalize().toAbsolutePath();
+		java.nio.file.Path filePath = Paths.get(file.getAbsolutePath()).normalize().toAbsolutePath();
+
+		if (!filePath.startsWith(mediaPath) || filePath.compareTo(mediaPath) == 0) {
+			throw new RuntimeException("Illegal file name");
+		}
+
 		multiPartFile.transferTo(file);
 	}
 
